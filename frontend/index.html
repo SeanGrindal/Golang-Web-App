@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Golong webapp</title>
+    <link rel="stylesheet" href="/frontend/styles/main.css">
+    <script src="/frontend/scripts/index.js" defer></script>
+  </head>
+  <body>
+    <!-- The welcome struct (shown in the main.go code) is received within the HTML and we just need to use the . operator and retrieve the information we want -->
+    <h1 class="welcome">Hello {{.Name}}, it is {{.Time}}</h1>
+  </body>
+</html>

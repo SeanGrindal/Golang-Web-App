@@ -1,37 +1,36 @@
 package main
 
 import (
-  "fmt"
-  "net/http"
+   "net/http"
+   "fmt"
+   "time"
+   "html/template"
 )
 
-var content =
-`
-<h1>
-  Welcome to my Golang application
-</h1>
-<p>
-  You are not logged in
-</p>
-`
-
-func handler(w http.ResponseWriter, r *http.Request) {
-  fmt.Fprint(w, content)
+type Welcome struct {
+  Name string
+  Time string
 }
 
 func main() {
-  if loggedIn := true; loggedIn {
-    content =
-    `
-    <h1>
-      Welcome to my Golang application
-    </h1>
-    <p>
-      You are logged in
-    </p>
-    `
-  }
+  welcome := Welcome { "there", time.Now().Format(time.Stamp) }
+  templates := template.Must( template.ParseFiles("frontend/index.html") )
 
-  http.HandleFunc("/", handler)
-  http.ListenAndServe(":8080", nil)
+  http.Handle("/frontend/", http.StripPrefix( "/frontend/", http.FileServer( http.Dir("frontend") ) ) )
+
+  http.HandleFunc("/" , func(w http.ResponseWriter, r *http.Request) {
+    if name := r.FormValue("name"); name != "" {
+       welcome.Name = name
+    } else {
+      welcome.Name = "there"
+    }
+
+
+    if err := templates.ExecuteTemplate(w, "index.html", welcome); err != nil {
+       http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
+  })
+
+  fmt.Println(http.ListenAndServe(":8080", nil))
+  fmt.println("Serving on port 8080")
 }
